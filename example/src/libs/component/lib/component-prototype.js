@@ -1,12 +1,11 @@
-import { CLASSNAMES, INITIAL_STATE, TRIGGER_EVENTS, TRIGGER_KEYCODES, KEY_CODES } from './constants';
+import { CLASSNAMES, INITIAL_STATE, DATA_ATTRIBUTES, TRIGGER_EVENTS, TRIGGER_KEYCODES, KEY_CODES } from './constants';
 import { initialState, readStateFromURL, writeStateToURL, isFirstItem, isLastItem } from './utils';
-import { buttons } from './templates';
 import { renderPage, renderSubpage } from './render';
 
 export default {
 	init() {
 		this.state = Object.assign({}, initialState, this.stateFromHash(initialState));
-		this.settings.buttons && this.initButtons();
+		this.state.buttons.length && this.initButtons();
 		this.render();
 
 		window.addEventListener('hashchange', this.handleHashChange.bind(this), false);
@@ -26,26 +25,14 @@ export default {
 		this.render();
 	},
 	initButtons(){
-		//only have buttons in DOM??
-		
-		let buttonContainer = this.root.appendChild(document.createElement('div'));
-		buttonContainer.classList.add(CLASSNAMES.BUTTON_CONTAINER);
-		buttonContainer.innerHTML = buttons();
-
-		// this.state = Object.assign({}, this.state, {
-		// 	previousButton: this.state.root.,querySelector('[data-page-action=previous]'),
-		// 	nextButton: this.state.root.querySelector('[data-page-action=next]')
-		// });
-
-		this.settings.buttons && TRIGGER_EVENTS.forEach(ev => {
-			[].slice.call(document.querySelectorAll(`.${CLASSNAMES.BUTTON}`)).forEach(btn => {
+		TRIGGER_EVENTS.forEach(ev => {
+			this.state.buttons.forEach(btn => {
 				btn.addEventListener(ev, e => {
 					if(e.keyCode && !~TRIGGER_KEYCODES.indexOf(e.KeyCode)) return;
-					this[btn.getAttribute('data-page-action')]();
+					this[btn.hasAttribute(DATA_ATTRIBUTES.BUTTON_NEXT) ? 'next' : 'previous']();
 				});
 			});
 		});
-		
 	},
 	handleKeyDown(e){
 		const keyDictionary = {
@@ -57,7 +44,13 @@ export default {
 	render(){
 		renderPage(this.state);
 		renderSubpage(this.state);
+		this.postRender();
 		// renderButtons(this.state;
+	},
+	postRender(){
+		(this.state.subpage !== false && this.state.pages[this.state.page].subpages[this.state.subpage].callback) && this.state.pages[this.state.page].subpages[this.state.subpage].callback();
+
+		this.state.pages[this.state.page].callback && this.state.pages[this.state.page].callback();
 	},
 	previous(){
 		if(isFirstItem(this.state)) return;

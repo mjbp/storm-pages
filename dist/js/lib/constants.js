@@ -7,6 +7,13 @@ export const CLASSNAMES = {
     BUTTON_CONTAINER: 'page__btn-container'
 };
 
+export const DATA_ATTRIBUTES = {
+    BUTTON_NEXT: 'data-page-next',
+    BUTTON_PREVIOUS: 'data-page-previous',
+    CALLBACK: 'data-page-callback',
+    PARAMS: 'data-page-params'
+};
+
 export const KEY_CODES = {
     SPACE: 32,
     ENTER: 13,

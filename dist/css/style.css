@@ -1,6 +1,6 @@
 /**
  * @name storm-pages: 
- * @version 0.1.0: Tue, 05 Dec 2017 17:51:03 GMT
+ * @version 0.1.0: Tue, 05 Dec 2017 21:16:14 GMT
  * @author stormid
  * @license MIT
  */
@@ -195,8 +195,13 @@ a:link,
   .page__sub.current {
     display: block; }
 
-.page__btn-container {
+.page__btn {
   position: fixed;
   bottom: 25px;
-  right: 25px;
   z-index: 1; }
+
+.page__btn--previous {
+  left: 25px; }
+
+.page__btn--next {
+  right: 25px; }

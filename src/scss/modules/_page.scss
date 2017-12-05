@@ -17,9 +17,14 @@
             display: block;
         }
 }
-.page__btn-container {
+.page__btn {
     position: fixed;
     bottom: 25px;
-    right:25px;
     z-index: 1;
+}
+.page__btn--previous {
+    left:25px;
+}
+.page__btn--next {
+    right:25px;
 }

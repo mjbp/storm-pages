@@ -25,24 +25,26 @@
 </head>
 <body>
     <div class="js-pages pages">
-        <section class="js-page page" hidden>
+        <section class="js-page page">
             <h1>1.</h1>
-            <div class="js-page__sub page__sub">1.1.</div>
+            <div class="js-page__sub page__sub" data-page-callback="testFn" data-page-params='["hello", "world"]'>1.1.</div>
             <div class="js-page__sub page__sub">1.2.</div>
             <div class="js-page__sub page__sub">1.3.</div>
         </section>
-        <section class="js-page page" hidden>
+        <section class="js-page page">
             <h1>2.</h1>
             <div class="js-page__sub page__sub">2.1.</div>
             <div class="js-page__sub page__sub">2.2.</div>
             <div class="js-page__sub page__sub">2.3.</div>
         </section>
-        <section class="js-page page" hidden>
+        <section class="js-page page">
             <h1>3.</h1>
             <div class="js-page__sub page__sub">3.1.</div>
             <div class="js-page__sub page__sub">3.2.</div>
             <div class="js-page__sub page__sub">3.3.</div>
         </section>
+        <div class="page__btn page__btn--previous" role="button" data-page-previous>Previous</div>
+        <div class="page__btn page__btn--next" role="button" data-page-next>Next</div>
     </div>
     <script src="./js/app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.min.js"></script>

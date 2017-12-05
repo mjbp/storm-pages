@@ -1,4 +1,6 @@
-import { CLASSNAMES, INITIAL_STATE } from './constants';
+import { CLASSNAMES, INITIAL_STATE, DATA_ATTRIBUTES } from './constants';
+
+const noop = () => {};
 
 export const writeStateToURL = props => {
     var url = '/';
@@ -40,7 +42,14 @@ export const initialState = Object.assign(
                                 {
                                     pages: [].slice.call(document.querySelectorAll(`.${CLASSNAMES.PAGE}`)).reduce((pages, page) => [...pages, {
                                         node: page,
-                                        subpages: [].slice.call(page.querySelectorAll(`.${CLASSNAMES.SUB_PAGE}`))
-                                    }], [])
+                                        callback: page.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function(){ page.getAttribute(DATA_ATTRIBUTES.CALLBACK).apply(this, page.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(page.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []) } : false,
+                                        subpages: [].slice.call(page.querySelectorAll(`.${CLASSNAMES.SUB_PAGE}`)).reduce((subpages, subpage) => [...subpages, {
+                                            node: subpage,
+                                            callback: subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function(){
+                                                window[subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK)].apply(this, subpage.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(subpage.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []);
+                                            } : false
+                                        }], [])
+                                    }], []),
+                                    buttons: [].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_NEXT}]`)).concat([].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_PREVIOUS}]`)))
                                 }
                             );

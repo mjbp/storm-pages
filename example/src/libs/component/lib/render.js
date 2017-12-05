@@ -16,7 +16,7 @@ export const renderSubpage = nextState => {
     
     nextState.pages[nextState.page].subpages.forEach((subpage, i) => {
         if(nextState.subpage >= i) {
-            showNode(subpage);
+            showNode(subpage.node);
         }
     });
 };
@@ -24,7 +24,7 @@ export const renderSubpage = nextState => {
 const resetSubpages = state => {
     state.pages.forEach((page, i) => {
         page.subpages.forEach(subpage => {
-            hideNode(subpage);
+            hideNode(subpage.node);
         });
     });
 };

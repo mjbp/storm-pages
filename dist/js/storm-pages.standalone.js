@@ -1,6 +1,6 @@
 /**
  * @name storm-pages: 
- * @version 0.1.0: Tue, 05 Dec 2017 17:51:02 GMT
+ * @version 0.1.0: Tue, 05 Dec 2017 21:16:14 GMT
  * @author stormid
  * @license MIT
  */
@@ -41,6 +41,13 @@ var CLASSNAMES = {
 				CURRENT: 'current',
 				BUTTON: 'js-page__btn',
 				BUTTON_CONTAINER: 'page__btn-container'
+};
+
+var DATA_ATTRIBUTES = {
+				BUTTON_NEXT: 'data-page-next',
+				BUTTON_PREVIOUS: 'data-page-previous',
+				CALLBACK: 'data-page-callback',
+				PARAMS: 'data-page-params'
 };
 
 var KEY_CODES = {
@@ -104,14 +111,21 @@ var initialState = Object.assign({}, INITIAL_STATE, {
 				pages: [].slice.call(document.querySelectorAll('.' + CLASSNAMES.PAGE)).reduce(function (pages, page) {
 								return [].concat(_toConsumableArray(pages), [{
 												node: page,
-												subpages: [].slice.call(page.querySelectorAll('.' + CLASSNAMES.SUB_PAGE))
+												callback: page.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function () {
+																page.getAttribute(DATA_ATTRIBUTES.CALLBACK).apply(this, page.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(page.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []);
+												} : false,
+												subpages: [].slice.call(page.querySelectorAll('.' + CLASSNAMES.SUB_PAGE)).reduce(function (subpages, subpage) {
+																return [].concat(_toConsumableArray(subpages), [{
+																				node: subpage,
+																				callback: subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function () {
+																								window[subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK)].apply(this, subpage.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(subpage.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []);
+																				} : false
+																}]);
+												}, [])
 								}]);
-				}, [])
+				}, []),
+				buttons: [].slice.call(document.querySelectorAll('[' + DATA_ATTRIBUTES.BUTTON_NEXT + ']')).concat([].slice.call(document.querySelectorAll('[' + DATA_ATTRIBUTES.BUTTON_PREVIOUS + ']')))
 });
-
-var buttons = function buttons() {
-				return '<div class="' + CLASSNAMES.BUTTON + ' page__btn page__btn--previous" role="button" data-page-action="previous">Previous</div>\n                            <div class="' + CLASSNAMES.BUTTON + ' page__btn page__btn--next" role="button" data-page-action="next">Next</div>';
-};
 
 var renderPage = function renderPage(nextState) {
 				nextState.pages.forEach(function (page, i) {
@@ -128,7 +142,7 @@ var renderSubpage = function renderSubpage(nextState) {
 
 				nextState.pages[nextState.page].subpages.forEach(function (subpage, i) {
 								if (nextState.subpage >= i) {
-												showNode(subpage);
+												showNode(subpage.node);
 								}
 				});
 };
@@ -136,7 +150,7 @@ var renderSubpage = function renderSubpage(nextState) {
 var resetSubpages = function resetSubpages(state) {
 				state.pages.forEach(function (page, i) {
 								page.subpages.forEach(function (subpage) {
-												hideNode(subpage);
+												hideNode(subpage.node);
 								});
 				});
 };
@@ -144,7 +158,7 @@ var resetSubpages = function resetSubpages(state) {
 var componentPrototype = {
 				init: function init() {
 								this.state = Object.assign({}, initialState, this.stateFromHash(initialState));
-								this.settings.buttons && this.initButtons();
+								this.state.buttons.length && this.initButtons();
 								this.render();
 
 								window.addEventListener('hashchange', this.handleHashChange.bind(this), false);
@@ -168,22 +182,11 @@ var componentPrototype = {
 				initButtons: function initButtons() {
 								var _this = this;
 
-								//only have buttons in DOM??
-
-								var buttonContainer = this.root.appendChild(document.createElement('div'));
-								buttonContainer.classList.add(CLASSNAMES.BUTTON_CONTAINER);
-								buttonContainer.innerHTML = buttons();
-
-								// this.state = Object.assign({}, this.state, {
-								// 	previousButton: this.state.root.,querySelector('[data-page-action=previous]'),
-								// 	nextButton: this.state.root.querySelector('[data-page-action=next]')
-								// });
-
-								this.settings.buttons && TRIGGER_EVENTS.forEach(function (ev) {
-												[].slice.call(document.querySelectorAll('.' + CLASSNAMES.BUTTON)).forEach(function (btn) {
+								TRIGGER_EVENTS.forEach(function (ev) {
+												_this.state.buttons.forEach(function (btn) {
 																btn.addEventListener(ev, function (e) {
 																				if (e.keyCode && !~TRIGGER_KEYCODES.indexOf(e.KeyCode)) return;
-																				_this[btn.getAttribute('data-page-action')]();
+																				_this[btn.hasAttribute(DATA_ATTRIBUTES.BUTTON_NEXT) ? 'next' : 'previous']();
 																});
 												});
 								});
@@ -201,7 +204,13 @@ var componentPrototype = {
 				render: function render() {
 								renderPage(this.state);
 								renderSubpage(this.state);
+								this.postRender();
 								// renderButtons(this.state;
+				},
+				postRender: function postRender() {
+								this.state.subpage !== false && this.state.pages[this.state.page].subpages[this.state.subpage].callback && this.state.pages[this.state.page].subpages[this.state.subpage].callback();
+
+								this.state.pages[this.state.page].callback && this.state.pages[this.state.page].callback();
 				},
 				previous: function previous() {
 								if (isFirstItem(this.state)) return;
