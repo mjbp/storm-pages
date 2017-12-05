@@ -45,9 +45,7 @@ export const initialState = Object.assign(
                                         callback: page.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function(){ page.getAttribute(DATA_ATTRIBUTES.CALLBACK).apply(this, page.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(page.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []) } : false,
                                         subpages: [].slice.call(page.querySelectorAll(`.${CLASSNAMES.SUB_PAGE}`)).reduce((subpages, subpage) => [...subpages, {
                                             node: subpage,
-                                            callback: subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function(){
-                                                window[subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK)].apply(this, subpage.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(subpage.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []);
-                                            } : false
+                                            callback: subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function() { window[`${subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK)}`].call(this); }.bind(subpage) : false
                                         }], [])
                                     }], []),
                                     buttons: [].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_NEXT}]`)).concat([].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_PREVIOUS}]`)))

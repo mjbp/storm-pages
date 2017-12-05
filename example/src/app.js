@@ -1,9 +1,8 @@
 import Pages from './libs/component';
 
 const onDOMContentLoadedTasks = [() => {
-    window.testFn = (test) => {
-        console.log('here');
-        console.log(test);
+    window.testFn = function() {
+        console.log(JSON.parse(this.getAttribute('data-page-params')).join(' '));
     };
     window.Pages = Pages.init('.js-pages');
 }];

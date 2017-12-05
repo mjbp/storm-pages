@@ -1,6 +1,6 @@
 /**
  * @name storm-pages: 
- * @version 0.1.0: Tue, 05 Dec 2017 21:16:14 GMT
+ * @version 0.1.0: Tue, 05 Dec 2017 21:41:42 GMT
  * @author stormid
  * @license MIT
  */
@@ -118,8 +118,8 @@ var initialState = Object.assign({}, INITIAL_STATE, {
 																return [].concat(_toConsumableArray(subpages), [{
 																				node: subpage,
 																				callback: subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function () {
-																								window[subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK)].apply(this, subpage.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(subpage.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []);
-																				} : false
+																								window['' + subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK)].call(this);
+																				}.bind(subpage) : false
 																}]);
 												}, [])
 								}]);
@@ -152,6 +152,12 @@ var resetSubpages = function resetSubpages(state) {
 								page.subpages.forEach(function (subpage) {
 												hideNode(subpage.node);
 								});
+				});
+};
+
+var renderButtons = function renderButtons(state) {
+				state.buttons.forEach(function (btn) {
+								//disable/enable
 				});
 };
 
@@ -204,6 +210,7 @@ var componentPrototype = {
 				render: function render() {
 								renderPage(this.state);
 								renderSubpage(this.state);
+								renderButtons(this.state);
 								this.postRender();
 								// renderButtons(this.state;
 				},

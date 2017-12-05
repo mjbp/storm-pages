@@ -1,6 +1,6 @@
 import { CLASSNAMES, INITIAL_STATE, DATA_ATTRIBUTES, TRIGGER_EVENTS, TRIGGER_KEYCODES, KEY_CODES } from './constants';
 import { initialState, readStateFromURL, writeStateToURL, isFirstItem, isLastItem } from './utils';
-import { renderPage, renderSubpage } from './render';
+import { renderPage, renderSubpage, renderButtons } from './render';
 
 export default {
 	init() {
@@ -44,6 +44,7 @@ export default {
 	render(){
 		renderPage(this.state);
 		renderSubpage(this.state);
+		renderButtons(this.state);
 		this.postRender();
 		// renderButtons(this.state;
 	},

@@ -29,4 +29,10 @@ const resetSubpages = state => {
     });
 };
 
+export const renderButtons = state => {
+    state.buttons.forEach(btn => {
+        //disable/enable
+    });
+};
+
 export const navigation = nextState => {};
