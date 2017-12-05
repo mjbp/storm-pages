@@ -17,3 +17,9 @@
             display: block;
         }
 }
+.page__btn-container {
+    position: fixed;
+    bottom: 25px;
+    right:25px;
+    z-index: 1;
+}

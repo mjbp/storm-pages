@@ -2,7 +2,9 @@ export const CLASSNAMES = {
     PAGE: 'js-page',
     SUB_PAGE: 'js-page__sub',
     HIDDEN: 'hidden',
-    CURRENT: 'current'
+    CURRENT: 'current',
+    BUTTON: 'js-page__btn',
+    BUTTON_CONTAINER: 'page__btn-container'
 };
 
 export const KEY_CODES = {
@@ -13,6 +15,10 @@ export const KEY_CODES = {
     RIGHT: 39,
     DOWN: 40
 };
+
+export const TRIGGER_EVENTS = ['click', 'keydown'];
+
+export const TRIGGER_KEYCODES = [13, 32];
 
 export const INITIAL_STATE = {
     page: false,

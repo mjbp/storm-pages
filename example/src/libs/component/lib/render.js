@@ -1,6 +1,5 @@
 import { CLASSNAMES } from './constants';
 import { hideNode, showNode } from './utils';
-import { controls, nav } from './templates';
 
 export const renderPage = nextState => {
     nextState.pages.forEach((page, i) => {
