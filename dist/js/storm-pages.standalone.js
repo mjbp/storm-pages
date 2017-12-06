@@ -1,6 +1,6 @@
 /**
  * @name storm-pages: 
- * @version 0.1.0: Tue, 05 Dec 2017 21:41:42 GMT
+ * @version 0.1.0: Wed, 06 Dec 2017 21:49:25 GMT
  * @author stormid
  * @license MIT
  */
@@ -107,6 +107,10 @@ var isFirstItem = function isFirstItem(state) {
 				return state.page === 0 && (state.pages[state.page].subpages.length === 0 || state.subpage === false);
 };
 
+var subpageHasCallback = function subpageHasCallback(state) {
+				return state.subpage !== false && state.pages[state.page].subpages[state.subpage].callback;
+};
+
 var initialState = Object.assign({}, INITIAL_STATE, {
 				pages: [].slice.call(document.querySelectorAll('.' + CLASSNAMES.PAGE)).reduce(function (pages, page) {
 								return [].concat(_toConsumableArray(pages), [{
@@ -118,7 +122,7 @@ var initialState = Object.assign({}, INITIAL_STATE, {
 																return [].concat(_toConsumableArray(subpages), [{
 																				node: subpage,
 																				callback: subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function () {
-																								window['' + subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK)].call(this);
+																								window['' + subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK)].apply(this, subpage.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(subpage.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []);
 																				}.bind(subpage) : false
 																}]);
 												}, [])
@@ -215,7 +219,7 @@ var componentPrototype = {
 								// renderButtons(this.state;
 				},
 				postRender: function postRender() {
-								this.state.subpage !== false && this.state.pages[this.state.page].subpages[this.state.subpage].callback && this.state.pages[this.state.page].subpages[this.state.subpage].callback();
+								if (subpageHasCallback(this.state)) this.state.pages[this.state.page].subpages[this.state.subpage].callback();
 
 								this.state.pages[this.state.page].callback && this.state.pages[this.state.page].callback();
 				},
@@ -234,6 +238,20 @@ var componentPrototype = {
 								} else this.state = Object.assign({}, this.state, { page: this.state.page + 1, subpage: false });
 
 								writeStateToURL(this.state);
+				},
+				goTo: function goTo(nextState) {
+								this.state = Object.assign({}, this.state, {
+												page: nextState.page !== null && nextState.page < this.state.pages.length ? nextState.page : this.state.page,
+												subpage: nextState.subpage < this.state.pages[nextState.page].subpages.length ? nextState.subpage : this.stateFromHash.subpage
+								});
+								writeStateToURL(this.state);
+
+								/*
+        {
+        	page: X,
+        	subpage: X || false
+        }
+        */
 				}
 };
 

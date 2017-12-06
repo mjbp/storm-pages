@@ -36,6 +36,8 @@ export const isLastItem = state => state.page + 1 === state.pages.length && (sta
 
 export const isFirstItem = state => state.page === 0 && (state.pages[state.page].subpages.length === 0 || state.subpage === false);
 
+export const subpageHasCallback = state => state.subpage !== false && state.pages[state.page].subpages[state.subpage].callback
+
 export const initialState = Object.assign(
                                 {},
                                 INITIAL_STATE,
@@ -45,7 +47,7 @@ export const initialState = Object.assign(
                                         callback: page.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function(){ page.getAttribute(DATA_ATTRIBUTES.CALLBACK).apply(this, page.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(page.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []) } : false,
                                         subpages: [].slice.call(page.querySelectorAll(`.${CLASSNAMES.SUB_PAGE}`)).reduce((subpages, subpage) => [...subpages, {
                                             node: subpage,
-                                            callback: subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function() { window[`${subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK)}`].call(this); }.bind(subpage) : false
+                                            callback: subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function() { window[`${subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK)}`].apply(this, subpage.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(subpage.getAttribute(DATA_ATTRIBUTES.PARAMS)): []); }.bind(subpage) : false
                                         }], [])
                                     }], []),
                                     buttons: [].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_NEXT}]`)).concat([].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_PREVIOUS}]`)))

@@ -1,5 +1,5 @@
 import { CLASSNAMES, INITIAL_STATE, DATA_ATTRIBUTES, TRIGGER_EVENTS, TRIGGER_KEYCODES, KEY_CODES } from './constants';
-import { initialState, readStateFromURL, writeStateToURL, isFirstItem, isLastItem } from './utils';
+import { initialState, readStateFromURL, writeStateToURL, isFirstItem, isLastItem, subpageHasCallback } from './utils';
 import { renderPage, renderSubpage, renderButtons } from './render';
 
 export default {
@@ -49,7 +49,7 @@ export default {
 		// renderButtons(this.state;
 	},
 	postRender(){
-		(this.state.subpage !== false && this.state.pages[this.state.page].subpages[this.state.subpage].callback) && this.state.pages[this.state.page].subpages[this.state.subpage].callback();
+		if(subpageHasCallback(this.state)) this.state.pages[this.state.page].subpages[this.state.subpage].callback();
 
 		this.state.pages[this.state.page].callback && this.state.pages[this.state.page].callback();
 	},
@@ -71,5 +71,19 @@ export default {
 		} else this.state = Object.assign({}, this.state, { page: this.state.page + 1, subpage: false });
 
 		writeStateToURL(this.state);
+	},
+	goTo(nextState){
+		this.state = Object.assign({}, this.state, {
+			page: nextState.page !== null && nextState.page < this.state.pages.length ? nextState.page : this.state.page,
+			subpage: nextState.subpage < this.state.pages[nextState.page].subpages.length ? nextState.subpage : this.stateFromHash.subpage
+		});
+		writeStateToURL(this.state);
+
+		/*
+		{
+			page: X,
+			subpage: X || false
+		}
+		*/
 	}
 };
