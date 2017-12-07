@@ -1,6 +1,6 @@
 import { CLASSNAMES, INITIAL_STATE, DATA_ATTRIBUTES, TRIGGER_EVENTS, TRIGGER_KEYCODES, KEY_CODES } from './constants';
-import { initialState, readStateFromURL, writeStateToURL, isFirstItem, isLastItem, subpageHasCallback } from './utils';
-import { renderPage, renderSubpage, renderButtons } from './render';
+import { initialState, readStateFromURL, writeStateToURL, isFirstItem, isLastItem, partHasCallback } from './utils';
+import { renderPage, renderPart, renderButtons } from './render';
 
 export default {
 	init() {
@@ -17,7 +17,7 @@ export default {
 		let candidate = readStateFromURL();
 		return Object.assign({}, this.state, {
 			page: candidate.page < 0 ? 0 : candidate.page >= previousState.pages.length ? previousState.pages.length - 1 : candidate.page,
-			subpage: previousState.pages[candidate.page].subpages ? candidate.nextSubpage < 0 ? 0 : candidate.subpage >= previousState.pages[candidate.page].subpages.length ? previousState.pages[candidate.page].subpages.length - 1 : candidate.subpage : false,
+			part: previousState.pages[candidate.page].parts ? candidate.nextPart < 0 ? 0 : candidate.part >= previousState.pages[candidate.page].parts.length ? previousState.pages[candidate.page].parts.length - 1 : candidate.part : false,
 		});
 	},
 	handleHashChange(){
@@ -43,40 +43,39 @@ export default {
 	},
 	render(){
 		renderPage(this.state);
-		renderSubpage(this.state);
+		renderPart(this.state);
 		renderButtons(this.state);
 		this.postRender();
 		// renderButtons(this.state;
 	},
 	postRender(){
-		if(subpageHasCallback(this.state))
-		(this.state.subpage !== false && this.state.pages[this.state.page].subpages[this.state.subpage].callback) && this.state.pages[this.state.page].subpages[this.state.subpage].callback();
+		if(partHasCallback(this.state)) this.state.pages[this.state.page].parts[this.state.part].callback();
 
 		this.state.pages[this.state.page].callback && this.state.pages[this.state.page].callback();
 	},
 	previous(){
 		if(isFirstItem(this.state)) return;
 		
-		if(this.state.pages[this.state.page].subpages.length > 0 && (this.state.subpage !== false && this.state.subpage > 0)) this.state = Object.assign({}, this.state, { subpage: this.state.subpage - 1});
-		else if(this.state.pages[this.state.page].subpages.length > 0 && this.state.subpage === 0) this.state = Object.assign({}, this.state, { subpage: false });
-		else this.state = Object.assign({}, this.state, { page: this.state.page - 1, subpage: this.state.pages[this.state.page - 1].subpages.length - 1 });
+		if(this.state.pages[this.state.page].parts.length > 0 && (this.state.part !== false && this.state.part > 0)) this.state = Object.assign({}, this.state, { part: this.state.part - 1});
+		else if(this.state.pages[this.state.page].parts.length > 0 && this.state.part === 0) this.state = Object.assign({}, this.state, { part: false });
+		else this.state = Object.assign({}, this.state, { page: this.state.page - 1, part: this.state.pages[this.state.page - 1].parts.length - 1 });
 		
 		writeStateToURL(this.state);
 	},
 	next(){
 		if(isLastItem(this.state)) return;
 
-		if(this.state.pages[this.state.page].subpages.length > 0 && this.state.subpage + 1 < this.state.pages[this.state.page].subpages.length){
-			if(this.state.subpage === false) this.state = Object.assign({}, this.state, { subpage: 0 });
-			else this.state = Object.assign({}, this.state, { subpage: this.state.subpage + 1 });
-		} else this.state = Object.assign({}, this.state, { page: this.state.page + 1, subpage: false });
+		if(this.state.pages[this.state.page].parts.length > 0 && this.state.part + 1 < this.state.pages[this.state.page].parts.length){
+			if(this.state.part === false) this.state = Object.assign({}, this.state, { part: 0 });
+			else this.state = Object.assign({}, this.state, { part: this.state.part + 1 });
+		} else this.state = Object.assign({}, this.state, { page: this.state.page + 1, part: false });
 
 		writeStateToURL(this.state);
 	},
 	goTo(nextState){
 		this.state = Object.assign({}, this.state, {
 			page: nextState.page !== null && nextState.page < this.state.pages.length ? nextState.page : this.state.page,
-			subpage: nextState.subpage < this.state.pages[nextState.page].subpages.length ? nextState.subpage : this.stateFromHash.subpage
+			part: nextState.part < this.state.pages[nextState.page].parts.length ? nextState.part : this.stateFromHash.part
 		});
 		writeStateToURL(this.state);
 

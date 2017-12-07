@@ -1,6 +1,6 @@
 export const CLASSNAMES = {
     PAGE: 'js-page',
-    SUB_PAGE: 'js-page__sub',
+    PART: 'js-page__sub',
     HIDDEN: 'hidden',
     CURRENT: 'current',
     BUTTON: 'js-page__btn',
@@ -10,8 +10,7 @@ export const CLASSNAMES = {
 export const DATA_ATTRIBUTES = {
     BUTTON_NEXT: 'data-page-next',
     BUTTON_PREVIOUS: 'data-page-previous',
-    CALLBACK: 'data-page-callback',
-    PARAMS: 'data-page-params'
+    CALLBACK: 'data-page-callback'
 };
 
 export const KEY_CODES = {
@@ -29,6 +28,6 @@ export const TRIGGER_KEYCODES = [13, 32];
 
 export const INITIAL_STATE = {
     page: false,
-    subpage: false,
+    part: false,
     pages: false
 };

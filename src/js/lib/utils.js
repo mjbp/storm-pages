@@ -6,7 +6,7 @@ export const writeStateToURL = props => {
     var url = '/';
 
     if(props.page >= 0) url += (props.page + 1);
-    if( props.subpage >= 0 && props.subpage !== false) url += '/' + (props.subpage + 1);
+    if( props.part >= 0 && props.part !== false) url += '/' + (props.part + 1);
 
     window.location.hash = url;
 };
@@ -16,7 +16,7 @@ export const readStateFromURL = () => {
 
     return {
         page: parseInt(parts[0], 10) ? parseInt(parts[0], 10) - 1 : 0,
-        subpage: parseInt(parts[1], 10) ? parseInt(parts[1], 10) - 1 : false,
+        part: parseInt(parts[1], 10) ? parseInt(parts[1], 10) - 1 : false,
     };
 };
 
@@ -32,11 +32,11 @@ export const showNode = node => {
     node.classList.remove(CLASSNAMES.HIDDEN);
 };
 
-export const isLastItem = state => state.page + 1 === state.pages.length && (state.pages[state.page].subpages.length === 0 || state.subpage + 1 === state.pages[state.page].subpages.length);
+export const isLastItem = state => state.page + 1 === state.pages.length && (state.pages[state.page].parts.length === 0 || state.part + 1 === state.pages[state.page].parts.length);
 
-export const isFirstItem = state => state.page === 0 && (state.pages[state.page].subpages.length === 0 || state.subpage === false);
+export const isFirstItem = state => state.page === 0 && (state.pages[state.page].parts.length === 0 || state.part === false);
 
-export const subpageHasCallback = state => state.subpage !== false && state.pages[state.page].subpages[state.subpage].callback
+export const partHasCallback = state => state.part !== false && state.pages[state.page].parts.length !== 0 && state.pages[state.page].parts[state.part].callback;
 
 export const initialState = Object.assign(
                                 {},
@@ -44,12 +44,12 @@ export const initialState = Object.assign(
                                 {
                                     pages: [].slice.call(document.querySelectorAll(`.${CLASSNAMES.PAGE}`)).reduce((pages, page) => [...pages, {
                                         node: page,
-                                        callback: page.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function(){ page.getAttribute(DATA_ATTRIBUTES.CALLBACK).apply(this, page.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(page.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []) } : false,
-                                        subpages: [].slice.call(page.querySelectorAll(`.${CLASSNAMES.SUB_PAGE}`)).reduce((subpages, subpage) => [...subpages, {
-                                            node: subpage,
-                                            callback: subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function() { window[`${subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK)}`].apply(this, subpage.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(subpage.getAttribute(DATA_ATTRIBUTES.PARAMS)): []); }.bind(subpage) : false
+                                        callback: page.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function(){ window[`${page.getAttribute(DATA_ATTRIBUTES.CALLBACK)}`].call(page); }.bind(page) : false,
+                                        parts: [].slice.call(page.querySelectorAll(`.${CLASSNAMES.PART}`)).reduce((parts, part) => [...parts, {
+                                            node: part,
+                                            callback: part.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function() { window[`${part.getAttribute(DATA_ATTRIBUTES.CALLBACK)}`].call(part); }.bind(part) : false,
                                         }], [])
                                     }], []),
-                                    buttons: [].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_NEXT}]`)).concat([].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_PREVIOUS}]`)))
+                                    buttons: [].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_PREVIOUS}]`)).concat([].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_NEXT}]`)))
                                 }
                             );

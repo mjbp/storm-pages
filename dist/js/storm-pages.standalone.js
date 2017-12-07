@@ -1,6 +1,6 @@
 /**
  * @name storm-pages: 
- * @version 0.1.0: Wed, 06 Dec 2017 21:49:25 GMT
+ * @version 0.1.0: Thu, 07 Dec 2017 12:18:43 GMT
  * @author stormid
  * @license MIT
  */
@@ -36,7 +36,7 @@ var defaults = {
 
 var CLASSNAMES = {
 				PAGE: 'js-page',
-				SUB_PAGE: 'js-page__sub',
+				PART: 'js-page__sub',
 				HIDDEN: 'hidden',
 				CURRENT: 'current',
 				BUTTON: 'js-page__btn',
@@ -46,8 +46,7 @@ var CLASSNAMES = {
 var DATA_ATTRIBUTES = {
 				BUTTON_NEXT: 'data-page-next',
 				BUTTON_PREVIOUS: 'data-page-previous',
-				CALLBACK: 'data-page-callback',
-				PARAMS: 'data-page-params'
+				CALLBACK: 'data-page-callback'
 };
 
 var KEY_CODES = {
@@ -65,7 +64,7 @@ var TRIGGER_KEYCODES = [13, 32];
 
 var INITIAL_STATE = {
 				page: false,
-				subpage: false,
+				part: false,
 				pages: false
 };
 
@@ -73,7 +72,7 @@ var writeStateToURL = function writeStateToURL(props) {
 				var url = '/';
 
 				if (props.page >= 0) url += props.page + 1;
-				if (props.subpage >= 0 && props.subpage !== false) url += '/' + (props.subpage + 1);
+				if (props.part >= 0 && props.part !== false) url += '/' + (props.part + 1);
 
 				window.location.hash = url;
 };
@@ -83,7 +82,7 @@ var readStateFromURL = function readStateFromURL() {
 
 				return {
 								page: parseInt(parts[0], 10) ? parseInt(parts[0], 10) - 1 : 0,
-								subpage: parseInt(parts[1], 10) ? parseInt(parts[1], 10) - 1 : false
+								part: parseInt(parts[1], 10) ? parseInt(parts[1], 10) - 1 : false
 				};
 };
 
@@ -100,15 +99,15 @@ var showNode = function showNode(node) {
 };
 
 var isLastItem = function isLastItem(state) {
-				return state.page + 1 === state.pages.length && (state.pages[state.page].subpages.length === 0 || state.subpage + 1 === state.pages[state.page].subpages.length);
+				return state.page + 1 === state.pages.length && (state.pages[state.page].parts.length === 0 || state.part + 1 === state.pages[state.page].parts.length);
 };
 
 var isFirstItem = function isFirstItem(state) {
-				return state.page === 0 && (state.pages[state.page].subpages.length === 0 || state.subpage === false);
+				return state.page === 0 && (state.pages[state.page].parts.length === 0 || state.part === false);
 };
 
-var subpageHasCallback = function subpageHasCallback(state) {
-				return state.subpage !== false && state.pages[state.page].subpages[state.subpage].callback;
+var partHasCallback = function partHasCallback(state) {
+				return state.part !== false && state.pages[state.page].parts[state.part].callback;
 };
 
 var initialState = Object.assign({}, INITIAL_STATE, {
@@ -118,17 +117,17 @@ var initialState = Object.assign({}, INITIAL_STATE, {
 												callback: page.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function () {
 																page.getAttribute(DATA_ATTRIBUTES.CALLBACK).apply(this, page.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(page.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []);
 												} : false,
-												subpages: [].slice.call(page.querySelectorAll('.' + CLASSNAMES.SUB_PAGE)).reduce(function (subpages, subpage) {
-																return [].concat(_toConsumableArray(subpages), [{
-																				node: subpage,
-																				callback: subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function () {
-																								window['' + subpage.getAttribute(DATA_ATTRIBUTES.CALLBACK)].apply(this, subpage.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(subpage.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []);
-																				}.bind(subpage) : false
+												parts: [].slice.call(page.querySelectorAll('.' + CLASSNAMES.PART)).reduce(function (parts, part) {
+																return [].concat(_toConsumableArray(parts), [{
+																				node: part,
+																				callback: part.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function () {
+																								window['' + part.getAttribute(DATA_ATTRIBUTES.CALLBACK)].apply(this, part.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(part.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []);
+																				}.bind(part) : false
 																}]);
 												}, [])
 								}]);
 				}, []),
-				buttons: [].slice.call(document.querySelectorAll('[' + DATA_ATTRIBUTES.BUTTON_NEXT + ']')).concat([].slice.call(document.querySelectorAll('[' + DATA_ATTRIBUTES.BUTTON_PREVIOUS + ']')))
+				buttons: [].slice.call(document.querySelectorAll('[' + DATA_ATTRIBUTES.BUTTON_PREVIOUS + ']')).concat([].slice.call(document.querySelectorAll('[' + DATA_ATTRIBUTES.BUTTON_NEXT + ']')))
 });
 
 var renderPage = function renderPage(nextState) {
@@ -140,28 +139,31 @@ var renderPage = function renderPage(nextState) {
 				showNode(nextState.pages[nextState.page].node);
 };
 
-var renderSubpage = function renderSubpage(nextState) {
-				resetSubpages(nextState);
-				if (nextState.subpage === false) return;
+var renderPart = function renderPart(nextState) {
+				resetParts(nextState);
+				if (nextState.part === false) return;
 
-				nextState.pages[nextState.page].subpages.forEach(function (subpage, i) {
-								if (nextState.subpage >= i) {
-												showNode(subpage.node);
+				nextState.pages[nextState.page].parts.forEach(function (part, i) {
+								if (nextState.part >= i) {
+												showNode(part.node);
 								}
 				});
 };
 
-var resetSubpages = function resetSubpages(state) {
+var resetParts = function resetParts(state) {
 				state.pages.forEach(function (page, i) {
-								page.subpages.forEach(function (subpage) {
-												hideNode(subpage.node);
+								page.parts.forEach(function (part) {
+												hideNode(part.node);
 								});
 				});
 };
 
 var renderButtons = function renderButtons(state) {
+				if (state.buttons.length === 0) return;
 				state.buttons.forEach(function (btn) {
-								//disable/enable
+								if (isFirstItem(state)) state.buttons[0].setAttribute('disabled', 'disabled');else if (state.buttons[0].hasAttribute('disabled')) state.buttons[0].removeAttribute('disabled');
+
+								if (isLastItem(state)) state.buttons[1].setAttribute('disabled', 'disabled');else if (state.buttons[1].hasAttribute('disabled')) state.buttons[1].removeAttribute('disabled');
 				});
 };
 
@@ -182,7 +184,7 @@ var componentPrototype = {
 								var candidate = readStateFromURL();
 								return Object.assign({}, this.state, {
 												page: candidate.page < 0 ? 0 : candidate.page >= previousState.pages.length ? previousState.pages.length - 1 : candidate.page,
-												subpage: previousState.pages[candidate.page].subpages ? candidate.nextSubpage < 0 ? 0 : candidate.subpage >= previousState.pages[candidate.page].subpages.length ? previousState.pages[candidate.page].subpages.length - 1 : candidate.subpage : false
+												part: previousState.pages[candidate.page].parts ? candidate.nextPart < 0 ? 0 : candidate.part >= previousState.pages[candidate.page].parts.length ? previousState.pages[candidate.page].parts.length - 1 : candidate.part : false
 								});
 				},
 				handleHashChange: function handleHashChange() {
@@ -213,36 +215,36 @@ var componentPrototype = {
 				},
 				render: function render() {
 								renderPage(this.state);
-								renderSubpage(this.state);
+								renderPart(this.state);
 								renderButtons(this.state);
 								this.postRender();
 								// renderButtons(this.state;
 				},
 				postRender: function postRender() {
-								if (subpageHasCallback(this.state)) this.state.pages[this.state.page].subpages[this.state.subpage].callback();
+								if (partHasCallback(this.state)) this.state.pages[this.state.page].parts[this.state.part].callback();
 
 								this.state.pages[this.state.page].callback && this.state.pages[this.state.page].callback();
 				},
 				previous: function previous() {
 								if (isFirstItem(this.state)) return;
 
-								if (this.state.pages[this.state.page].subpages.length > 0 && this.state.subpage !== false && this.state.subpage > 0) this.state = Object.assign({}, this.state, { subpage: this.state.subpage - 1 });else if (this.state.pages[this.state.page].subpages.length > 0 && this.state.subpage === 0) this.state = Object.assign({}, this.state, { subpage: false });else this.state = Object.assign({}, this.state, { page: this.state.page - 1, subpage: this.state.pages[this.state.page - 1].subpages.length - 1 });
+								if (this.state.pages[this.state.page].parts.length > 0 && this.state.part !== false && this.state.part > 0) this.state = Object.assign({}, this.state, { part: this.state.part - 1 });else if (this.state.pages[this.state.page].parts.length > 0 && this.state.part === 0) this.state = Object.assign({}, this.state, { part: false });else this.state = Object.assign({}, this.state, { page: this.state.page - 1, part: this.state.pages[this.state.page - 1].parts.length - 1 });
 
 								writeStateToURL(this.state);
 				},
 				next: function next() {
 								if (isLastItem(this.state)) return;
 
-								if (this.state.pages[this.state.page].subpages.length > 0 && this.state.subpage + 1 < this.state.pages[this.state.page].subpages.length) {
-												if (this.state.subpage === false) this.state = Object.assign({}, this.state, { subpage: 0 });else this.state = Object.assign({}, this.state, { subpage: this.state.subpage + 1 });
-								} else this.state = Object.assign({}, this.state, { page: this.state.page + 1, subpage: false });
+								if (this.state.pages[this.state.page].parts.length > 0 && this.state.part + 1 < this.state.pages[this.state.page].parts.length) {
+												if (this.state.part === false) this.state = Object.assign({}, this.state, { part: 0 });else this.state = Object.assign({}, this.state, { part: this.state.part + 1 });
+								} else this.state = Object.assign({}, this.state, { page: this.state.page + 1, part: false });
 
 								writeStateToURL(this.state);
 				},
 				goTo: function goTo(nextState) {
 								this.state = Object.assign({}, this.state, {
 												page: nextState.page !== null && nextState.page < this.state.pages.length ? nextState.page : this.state.page,
-												subpage: nextState.subpage < this.state.pages[nextState.page].subpages.length ? nextState.subpage : this.stateFromHash.subpage
+												part: nextState.part < this.state.pages[nextState.page].parts.length ? nextState.part : this.stateFromHash.part
 								});
 								writeStateToURL(this.state);
 

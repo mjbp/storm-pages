@@ -19,8 +19,22 @@
 }
 .page__btn {
     position: fixed;
-    bottom: 25px;
+    bottom: 50%;
     z-index: 1;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius:50%;
+    transition: border 260ms ease;
+        &[disabled]{
+            cursor: auto;
+            opacity: .4;
+        }
+        &:not([disabled]):hover {
+            border-color: #191919;
+        }
+}
+.page__btn-icon {
+    display:block;
 }
 .page__btn--previous {
     left:25px;
