@@ -49,9 +49,8 @@ export default {
 		// renderButtons(this.state;
 	},
 	postRender(){
+		if(this.state.pages[this.state.page].callback) this.state.pages[this.state.page].callback();
 		if(partHasCallback(this.state)) this.state.pages[this.state.page].parts[this.state.part].callback();
-
-		this.state.pages[this.state.page].callback && this.state.pages[this.state.page].callback();
 	},
 	previous(){
 		if(isFirstItem(this.state)) return;
@@ -68,7 +67,9 @@ export default {
 		if(this.state.pages[this.state.page].parts.length > 0 && this.state.part + 1 < this.state.pages[this.state.page].parts.length){
 			if(this.state.part === false) this.state = Object.assign({}, this.state, { part: 0 });
 			else this.state = Object.assign({}, this.state, { part: this.state.part + 1 });
-		} else this.state = Object.assign({}, this.state, { page: this.state.page + 1, part: false });
+		} else {
+			this.state = Object.assign({}, this.state, { page: this.state.page + 1, part: false });
+		}
 
 		writeStateToURL(this.state);
 	},
@@ -78,12 +79,6 @@ export default {
 			part: nextState.part < this.state.pages[nextState.page].parts.length ? nextState.part : this.stateFromHash.part
 		});
 		writeStateToURL(this.state);
-
-		/*
-		{
-			page: X,
-			subpage: X || false
-		}
-		*/
+		
 	}
 };

@@ -20,14 +20,22 @@ export const readStateFromURL = () => {
     };
 };
 
+export const resetNode = node => {
+    node.classList.remove(CLASSNAMES.CURRENT);
+    node.classList.remove(CLASSNAMES.PAST);
+    node.classList.remove(CLASSNAMES.FUTURE);
+    node.classList.remove(CLASSNAMES.PREVIOUS);
+    node.classList.remove(CLASSNAMES.NEXT);
+};
+
 export const hideNode = node => {
-    node.setAttribute('hidden', 'hidden');
+    //node.setAttribute('hidden', 'hidden');
     node.classList.remove(CLASSNAMES.CURRENT);
     node.classList.add(CLASSNAMES.HIDDEN);
 };
 
 export const showNode = node => {
-    node.removeAttribute('hidden');
+    // node.removeAttribute('hidden');
     node.classList.add(CLASSNAMES.CURRENT);
     node.classList.remove(CLASSNAMES.HIDDEN);
 };
@@ -36,7 +44,7 @@ export const isLastItem = state => state.page + 1 === state.pages.length && (sta
 
 export const isFirstItem = state => state.page === 0 && (state.pages[state.page].parts.length === 0 || state.part === false);
 
-export const partHasCallback = state => state.part !== false && state.pages[state.page].parts[state.part].callback
+export const partHasCallback = state => state.part !== false && state.pages[state.page].parts.length !== 0 && state.pages[state.page].parts[state.part].callback;
 
 export const initialState = Object.assign(
                                 {},
@@ -44,10 +52,10 @@ export const initialState = Object.assign(
                                 {
                                     pages: [].slice.call(document.querySelectorAll(`.${CLASSNAMES.PAGE}`)).reduce((pages, page) => [...pages, {
                                         node: page,
-                                        callback: page.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function(){ page.getAttribute(DATA_ATTRIBUTES.CALLBACK).apply(this, page.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(page.getAttribute(DATA_ATTRIBUTES.PARAMS)) : []) } : false,
+                                        callback: page.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function(){ window[`${page.getAttribute(DATA_ATTRIBUTES.CALLBACK)}`].call(page); }.bind(page) : false,
                                         parts: [].slice.call(page.querySelectorAll(`.${CLASSNAMES.PART}`)).reduce((parts, part) => [...parts, {
                                             node: part,
-                                            callback: part.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function() { window[`${part.getAttribute(DATA_ATTRIBUTES.CALLBACK)}`].apply(this, part.getAttribute(DATA_ATTRIBUTES.PARAMS) ? JSON.parse(part.getAttribute(DATA_ATTRIBUTES.PARAMS)): []); }.bind(part) : false
+                                            callback: part.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function() { window[`${part.getAttribute(DATA_ATTRIBUTES.CALLBACK)}`].call(part); }.bind(part) : false,
                                         }], [])
                                     }], []),
                                     buttons: [].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_PREVIOUS}]`)).concat([].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_NEXT}]`)))

@@ -1,7 +1,17 @@
 .page {
-    display: none;
+	display: none;
+	position: absolute;
+	pointer-events: auto;
+	z-index: 10;
+	transform-style: flat;
+	transition: transform-origin 800ms cubic-bezier(0.260, 0.860, 0.440, 0.985),
+				transform 800ms cubic-bezier(0.260, 0.860, 0.440, 0.985),
+				visibility 800ms cubic-bezier(0.260, 0.860, 0.440, 0.985),
+				opacity 800ms cubic-bezier(0.260, 0.860, 0.440, 0.985);
         &.current {
             display: block;
+            z-index: 11;
+            opacity: 1;
             position: fixed;
             top:0;
             left:0;
@@ -9,18 +19,45 @@
             bottom:0;
             overflow-y:auto;
             background:#efefef;
+            pointer-events: auto;
+        }
+        &.future,
+        &.past {
+            pointer-events: none;
+        }
+        &.next,
+        &.previous {
+            display: block;
+            opacity: 0;
         }
 }
-.page__sub {
-    display: none;
+
+.page[data-transition=fade],
+.page:not([data-transition]) {
+	transition: opacity 500ms;
+}
+
+
+.reveal.fade.overview .slides section,
+.reveal.fade.overview .slides>section>section {
+	transition: none;
+}
+.page__part {
+    opacity:0;
         &.current {
             display: block;
+            opacity:1;
         }
+        &[data-transition=fade],
+        &:not([data-transition]) {
+            transition: opacity 500ms;
+        }
+        
 }
 .page__btn {
     position: fixed;
     bottom: 50%;
-    z-index: 1;
+    z-index: 12;
     cursor: pointer;
     border: 1px solid #ccc;
     border-radius:50%;

@@ -1,13 +1,23 @@
 import { CLASSNAMES } from './constants';
-import { hideNode, showNode, isFirstItem, isLastItem } from './utils';
+import { resetNode, hideNode, showNode, isFirstItem, isLastItem } from './utils';
 
 export const renderPage = nextState => {
     nextState.pages.forEach((page, i) => {
-        if(nextState.page !== i) {
-            hideNode(page.node);
+        // if(nextState.page !== i) {
+        //     hideNode(page.node);
+        // }
+        resetNode(page.node);
+        if(nextState.page > i){
+            page.node.classList.add(CLASSNAMES.PAST);
+            if(nextState.page - 1 === i) page.node.classList.add(CLASSNAMES.PREVIOUS);
+        } 
+        if(nextState.page === i) page.node.classList.add(CLASSNAMES.CURRENT);
+        if(nextState.page < i) {
+            page.node.classList.add(CLASSNAMES.FUTURE);
+            if(nextState.page + 1 === i)  page.node.classList.add(CLASSNAMES.NEXT);
         }
     });
-    showNode(nextState.pages[nextState.page].node);
+    // showNode(nextState.pages[nextState.page].node);
 };
 
 export const renderPart = nextState => {

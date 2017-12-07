@@ -1,6 +1,6 @@
 /**
  * @name storm-pages: 
- * @version 0.1.0: Thu, 07 Dec 2017 12:18:44 GMT
+ * @version 0.1.0: Thu, 07 Dec 2017 20:06:51 GMT
  * @author stormid
  * @license MIT
  */
@@ -179,26 +179,57 @@ a:link,
   color: #191919; }
 
 .page {
-  display: none; }
+  display: none;
+  position: absolute;
+  pointer-events: auto;
+  z-index: 10;
+  -webkit-transform-style: flat;
+          transform-style: flat;
+  -webkit-transition: visibility 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), opacity 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), -webkit-transform-origin 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), -webkit-transform 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
+  transition: visibility 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), opacity 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), -webkit-transform-origin 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), -webkit-transform 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
+  transition: transform-origin 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), transform 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), visibility 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), opacity 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
+  transition: transform-origin 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), transform 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), visibility 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), opacity 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), -webkit-transform-origin 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), -ms-transform-origin 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), -webkit-transform 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
   .page.current {
     display: block;
+    z-index: 11;
+    opacity: 1;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     overflow-y: auto;
-    background: #efefef; }
+    background: #efefef;
+    pointer-events: auto; }
+  .page.future, .page.past {
+    pointer-events: none; }
+  .page.next, .page.previous {
+    display: block;
+    opacity: 0; }
 
-.page__sub {
-  display: none; }
-  .page__sub.current {
-    display: block; }
+.page[data-transition=fade],
+.page:not([data-transition]) {
+  -webkit-transition: opacity 500ms;
+  transition: opacity 500ms; }
+
+.reveal.fade.overview .slides section,
+.reveal.fade.overview .slides > section > section {
+  -webkit-transition: none;
+  transition: none; }
+
+.page__part {
+  opacity: 0; }
+  .page__part.current {
+    display: block;
+    opacity: 1; }
+  .page__part[data-transition=fade], .page__part:not([data-transition]) {
+    -webkit-transition: opacity 500ms;
+    transition: opacity 500ms; }
 
 .page__btn {
   position: fixed;
   bottom: 50%;
-  z-index: 1;
+  z-index: 12;
   cursor: pointer;
   border: 1px solid #ccc;
   -webkit-border-radius: 50%;

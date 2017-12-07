@@ -3,6 +3,10 @@ export const CLASSNAMES = {
     PART: 'js-page__part',
     HIDDEN: 'hidden',
     CURRENT: 'current',
+    PAST: 'past',
+    FUTURE: 'future',
+    PREVIOUS: 'previous',
+    NEXT: 'next',
     BUTTON: 'js-page__btn',
     BUTTON_CONTAINER: 'page__btn-container'
 };

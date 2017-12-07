@@ -20,14 +20,22 @@ export const readStateFromURL = () => {
     };
 };
 
+export const resetNode = node => {
+    node.classList.remove(CLASSNAMES.CURRENT);
+    node.classList.remove(CLASSNAMES.PAST);
+    node.classList.remove(CLASSNAMES.FUTURE);
+    node.classList.remove(CLASSNAMES.PREVIOUS);
+    node.classList.remove(CLASSNAMES.NEXT);
+};
+
 export const hideNode = node => {
-    node.setAttribute('hidden', 'hidden');
+    //node.setAttribute('hidden', 'hidden');
     node.classList.remove(CLASSNAMES.CURRENT);
     node.classList.add(CLASSNAMES.HIDDEN);
 };
 
 export const showNode = node => {
-    node.removeAttribute('hidden');
+    // node.removeAttribute('hidden');
     node.classList.add(CLASSNAMES.CURRENT);
     node.classList.remove(CLASSNAMES.HIDDEN);
 };
