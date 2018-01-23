@@ -1,6 +1,6 @@
 /**
  * @name storm-pages: 
- * @version 0.1.0: Tue, 23 Jan 2018 11:43:41 GMT
+ * @version 0.1.0: Tue, 23 Jan 2018 12:03:35 GMT
  * @author stormid
  * @license MIT
  */
@@ -159,6 +159,7 @@ var renderPage = function renderPage(nextState) {
     nextState.pages.forEach(function (page, i) {
         resetNode(page.node);
         renderNode(page.node, nextState.page, i);
+        resetNode(page.background);
         renderNode(page.background, nextState.page, i);
     });
 };
@@ -177,27 +178,16 @@ var renderNode = function renderNode(item, nextSubState, i) {
 
 var renderPart = function renderPart(nextState) {
     resetParts(nextState);
-    //swap out subsequent  parts
     if (nextState.part === false) return;
     nextState.pages[nextState.page].parts.forEach(function (part, i) {
         renderNode(part.node, nextState.part, i);
     });
-
-    //add subsequent parts
-    //make this option configurable/selectable
-    // resetParts(nextState);
-    // if(nextState.part === false) return;
-
-    // nextState.pages[nextState.page].parts.forEach((part, i) => {
-    //     if(nextState.part >= i) {
-    //         showNode(part.node);
-    //     }
-    // });
 };
 
 var resetParts = function resetParts(state) {
     state.pages.forEach(function (page, i) {
         page.parts && page.parts.forEach(function (part) {
+            resetNode(part.node);
             hideNode(part.node);
         });
     });

@@ -55,8 +55,11 @@
 
 .page__part {
     opacity:0;
-        &.current {
+    position: absolute;
+        &.current,
+        &.list.past {
             display: block;
+            position: relative;
             opacity:1;
         }
         &[data-transition=fade],

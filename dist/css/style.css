@@ -1,6 +1,6 @@
 /**
  * @name storm-pages: 
- * @version 0.1.0: Tue, 23 Jan 2018 11:43:42 GMT
+ * @version 0.1.0: Tue, 23 Jan 2018 12:03:36 GMT
  * @author stormid
  * @license MIT
  */
@@ -227,9 +227,11 @@ a:link,
     opacity: 0; }
 
 .page__part {
-  opacity: 0; }
-  .page__part.current {
+  opacity: 0;
+  position: absolute; }
+  .page__part.current, .page__part.list.past {
     display: block;
+    position: relative;
     opacity: 1; }
   .page__part[data-transition=fade], .page__part:not([data-transition]) {
     -webkit-transition: opacity 500ms;

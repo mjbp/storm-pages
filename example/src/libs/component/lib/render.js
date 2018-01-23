@@ -5,6 +5,7 @@ export const renderPage = nextState => {
     nextState.pages.forEach((page, i) => {
         resetNode(page.node);
         renderNode(page.node, nextState.page, i);
+        resetNode(page.background);
         renderNode(page.background, nextState.page, i);
     });
 };
@@ -21,30 +22,18 @@ const renderNode = (item, nextSubState, i) => {
     }
 };
 
-
 export const renderPart = nextState => {
     resetParts(nextState);
-    //swap out subsequent  parts
     if(nextState.part  === false) return;
     nextState.pages[nextState.page].parts.forEach((part, i) => {
         renderNode(part.node, nextState.part, i);
     });
-
-    //add subsequent parts
-    //make this option configurable/selectable
-    // resetParts(nextState);
-    // if(nextState.part === false) return;
-    
-    // nextState.pages[nextState.page].parts.forEach((part, i) => {
-    //     if(nextState.part >= i) {
-    //         showNode(part.node);
-    //     }
-    // });
 };
 
 const resetParts = state => {
     state.pages.forEach((page, i) => {
         page.parts && page.parts.forEach(part => {
+            resetNode(part.node);
             hideNode(part.node);
         });
     });
