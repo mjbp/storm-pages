@@ -40,11 +40,26 @@ export const showNode = node => {
     node.classList.remove(CLASSNAMES.HIDDEN);
 };
 
-export const isLastItem = state => state.page + 1 === state.pages.length && (state.pages[state.page].parts.length === 0 || state.part + 1 === state.pages[state.page].parts.length);
+export const extractBackgrounds = state => {
+    let backgroundContainer = n('div', { class: CLASSNAMES.BG_CONTAINER});
+    state.pages.forEach(page => {
+        backgroundContainer.appendChild(page.background || n('div', {class: CLASSNAMES.BG.replace('js_', '')}));
+        //page.background && page.node.removeChild(page.background);
+    });
+    state.pages[0].node.parentNode.parentNode.insertBefore(backgroundContainer, state.pages[0].node.parentNode.nextElementSibling);
+};
+
+export const isLastItem = state => state.page + 1 === state.pages.length && (state.pages[state.page].parts.length === 0 || state.part + 1 === state.pages[state.page].parts.length || !state.pages[state.page].parts);
 
 export const isFirstItem = state => state.page === 0 && (state.pages[state.page].parts.length === 0 || state.part === false);
 
 export const partHasCallback = state => state.part !== false && state.pages[state.page].parts.length !== 0 && state.pages[state.page].parts[state.part].callback;
+
+const n = (nodeType, attributes) => {
+    let node = document.createElement(nodeType);
+    for(let prop in attributes) node.setAttribute(prop, attributes[prop]);
+    return node;
+};
 
 export const initialState = Object.assign(
                                 {},
@@ -52,11 +67,12 @@ export const initialState = Object.assign(
                                 {
                                     pages: [].slice.call(document.querySelectorAll(`.${CLASSNAMES.PAGE}`)).reduce((pages, page) => [...pages, {
                                         node: page,
+                                        background: page.querySelector(`.${CLASSNAMES.BG}`) ? page.querySelector(`.${CLASSNAMES.BG}`) : false,
                                         callback: page.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function(){ window[`${page.getAttribute(DATA_ATTRIBUTES.CALLBACK)}`].call(page); }.bind(page) : false,
-                                        parts: [].slice.call(page.querySelectorAll(`.${CLASSNAMES.PART}`)).reduce((parts, part) => [...parts, {
+                                        parts: [].slice.call(page.querySelectorAll(`.${CLASSNAMES.PART}`)).length ? [].slice.call(page.querySelectorAll(`.${CLASSNAMES.PART}`)).reduce((parts, part) => [...parts, {
                                             node: part,
                                             callback: part.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function() { window[`${part.getAttribute(DATA_ATTRIBUTES.CALLBACK)}`].call(part); }.bind(part) : false,
-                                        }], [])
+                                        }], []) : false
                                     }], []),
                                     buttons: [].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_PREVIOUS}]`)).concat([].slice.call(document.querySelectorAll(`[${DATA_ATTRIBUTES.BUTTON_NEXT}]`)))
                                 }

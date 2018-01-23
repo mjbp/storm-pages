@@ -1,6 +1,6 @@
 /**
  * @name storm-pages: 
- * @version 0.1.0: Thu, 07 Dec 2017 20:06:51 GMT
+ * @version 0.1.0: Tue, 23 Jan 2018 11:05:58 GMT
  * @author stormid
  * @license MIT
  */
@@ -37,6 +37,8 @@ var defaults = {
 var CLASSNAMES = {
     PAGE: 'js-page',
     PART: 'js-page__part',
+    BG: 'js-page__bg',
+    BG_CONTAINER: 'page__bgs',
     HIDDEN: 'hidden',
     CURRENT: 'current',
     PAST: 'past',
@@ -110,8 +112,17 @@ var showNode = function showNode(node) {
     node.classList.remove(CLASSNAMES.HIDDEN);
 };
 
+var extractBackgrounds = function extractBackgrounds(state) {
+    var backgroundContainer = n('div', { class: CLASSNAMES.BG_CONTAINER });
+    state.pages.forEach(function (page) {
+        backgroundContainer.appendChild(page.background || n('div', { class: CLASSNAMES.BG.replace('js_', '') }));
+        //page.background && page.node.removeChild(page.background);
+    });
+    state.pages[0].node.parentNode.parentNode.insertBefore(backgroundContainer, state.pages[0].node.parentNode.nextElementSibling);
+};
+
 var isLastItem = function isLastItem(state) {
-    return state.page + 1 === state.pages.length && (state.pages[state.page].parts.length === 0 || state.part + 1 === state.pages[state.page].parts.length);
+    return state.page + 1 === state.pages.length && (state.pages[state.page].parts.length === 0 || state.part + 1 === state.pages[state.page].parts.length || !state.pages[state.page].parts);
 };
 
 var isFirstItem = function isFirstItem(state) {
@@ -122,21 +133,29 @@ var partHasCallback = function partHasCallback(state) {
     return state.part !== false && state.pages[state.page].parts.length !== 0 && state.pages[state.page].parts[state.part].callback;
 };
 
+var n = function n(nodeType, attributes) {
+    var node = document.createElement(nodeType);
+    for (var prop in attributes) {
+        node.setAttribute(prop, attributes[prop]);
+    }return node;
+};
+
 var initialState = Object.assign({}, INITIAL_STATE, {
     pages: [].slice.call(document.querySelectorAll('.' + CLASSNAMES.PAGE)).reduce(function (pages, page) {
         return [].concat(_toConsumableArray(pages), [{
             node: page,
+            background: page.querySelector('.' + CLASSNAMES.BG) ? page.querySelector('.' + CLASSNAMES.BG) : false,
             callback: page.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function () {
                 window['' + page.getAttribute(DATA_ATTRIBUTES.CALLBACK)].call(page);
             }.bind(page) : false,
-            parts: [].slice.call(page.querySelectorAll('.' + CLASSNAMES.PART)).reduce(function (parts, part) {
+            parts: [].slice.call(page.querySelectorAll('.' + CLASSNAMES.PART)).length ? [].slice.call(page.querySelectorAll('.' + CLASSNAMES.PART)).reduce(function (parts, part) {
                 return [].concat(_toConsumableArray(parts), [{
                     node: part,
                     callback: part.getAttribute(DATA_ATTRIBUTES.CALLBACK) ? function () {
                         window['' + part.getAttribute(DATA_ATTRIBUTES.CALLBACK)].call(part);
                     }.bind(part) : false
                 }]);
-            }, [])
+            }, []) : false
         }]);
     }, []),
     buttons: [].slice.call(document.querySelectorAll('[' + DATA_ATTRIBUTES.BUTTON_PREVIOUS + ']')).concat([].slice.call(document.querySelectorAll('[' + DATA_ATTRIBUTES.BUTTON_NEXT + ']')))
@@ -148,14 +167,26 @@ var renderPage = function renderPage(nextState) {
         //     hideNode(page.node);
         // }
         resetNode(page.node);
+        resetNode(page.background);
         if (nextState.page > i) {
             page.node.classList.add(CLASSNAMES.PAST);
-            if (nextState.page - 1 === i) page.node.classList.add(CLASSNAMES.PREVIOUS);
+            page.background.classList.add(CLASSNAMES.PAST);
+            if (nextState.page - 1 === i) {
+                page.node.classList.add(CLASSNAMES.PREVIOUS);
+                page.background.classList.add(CLASSNAMES.PREVIOUS);
+            }
         }
-        if (nextState.page === i) page.node.classList.add(CLASSNAMES.CURRENT);
+        if (nextState.page === i) {
+            page.node.classList.add(CLASSNAMES.CURRENT);
+            page.background.classList.add(CLASSNAMES.CURRENT);
+        }
         if (nextState.page < i) {
             page.node.classList.add(CLASSNAMES.FUTURE);
-            if (nextState.page + 1 === i) page.node.classList.add(CLASSNAMES.NEXT);
+            page.background.classList.add(CLASSNAMES.FUTURE);
+            if (nextState.page + 1 === i) {
+                page.node.classList.add(CLASSNAMES.NEXT);
+                page.background.classList.add(CLASSNAMES.NEXT);
+            }
         }
     });
     // showNode(nextState.pages[nextState.page].node);
@@ -174,7 +205,7 @@ var renderPart = function renderPart(nextState) {
 
 var resetParts = function resetParts(state) {
     state.pages.forEach(function (page, i) {
-        page.parts.forEach(function (part) {
+        page.parts && page.parts.forEach(function (part) {
             hideNode(part.node);
         });
     });
@@ -193,6 +224,7 @@ var componentPrototype = {
     init: function init() {
         this.state = Object.assign({}, initialState, this.stateFromHash(initialState));
         this.state.buttons.length && this.initButtons();
+        extractBackgrounds(this.state);
         this.render();
 
         window.addEventListener('hashchange', this.handleHashChange.bind(this), false);

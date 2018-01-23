@@ -1,11 +1,12 @@
 import { CLASSNAMES, INITIAL_STATE, DATA_ATTRIBUTES, TRIGGER_EVENTS, TRIGGER_KEYCODES, KEY_CODES } from './constants';
-import { initialState, readStateFromURL, writeStateToURL, isFirstItem, isLastItem, partHasCallback } from './utils';
+import { initialState, readStateFromURL, writeStateToURL, isFirstItem, isLastItem, extractBackgrounds, partHasCallback } from './utils';
 import { renderPage, renderPart, renderButtons } from './render';
 
 export default {
 	init() {
 		this.state = Object.assign({}, initialState, this.stateFromHash(initialState));
 		this.state.buttons.length && this.initButtons();
+		extractBackgrounds(this.state);
 		this.render();
 
 		window.addEventListener('hashchange', this.handleHashChange.bind(this), false);

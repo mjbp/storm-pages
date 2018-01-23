@@ -1,6 +1,8 @@
 export const CLASSNAMES = {
     PAGE: 'js-page',
     PART: 'js-page__part',
+    BG: 'js-page__bg',
+    BG_CONTAINER: 'page__bgs',
     HIDDEN: 'hidden',
     CURRENT: 'current',
     PAST: 'past',
@@ -8,7 +10,7 @@ export const CLASSNAMES = {
     PREVIOUS: 'previous',
     NEXT: 'next',
     BUTTON: 'js-page__btn',
-    BUTTON_CONTAINER: 'page__btn-container'
+    BUTTON_CONTAINER: 'page__btn-container',
 };
 
 export const DATA_ATTRIBUTES = {

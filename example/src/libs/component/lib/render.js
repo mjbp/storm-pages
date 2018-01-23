@@ -7,14 +7,26 @@ export const renderPage = nextState => {
         //     hideNode(page.node);
         // }
         resetNode(page.node);
+        resetNode(page.background);
         if(nextState.page > i){
             page.node.classList.add(CLASSNAMES.PAST);
-            if(nextState.page - 1 === i) page.node.classList.add(CLASSNAMES.PREVIOUS);
+            page.background.classList.add(CLASSNAMES.PAST);
+            if(nextState.page - 1 === i) {
+                page.node.classList.add(CLASSNAMES.PREVIOUS);
+                page.background.classList.add(CLASSNAMES.PREVIOUS);
+            }
         } 
-        if(nextState.page === i) page.node.classList.add(CLASSNAMES.CURRENT);
+        if(nextState.page === i) {
+            page.node.classList.add(CLASSNAMES.CURRENT);
+            page.background.classList.add(CLASSNAMES.CURRENT);
+        }
         if(nextState.page < i) {
             page.node.classList.add(CLASSNAMES.FUTURE);
-            if(nextState.page + 1 === i)  page.node.classList.add(CLASSNAMES.NEXT);
+            page.background.classList.add(CLASSNAMES.FUTURE);
+            if(nextState.page + 1 === i) {
+                page.node.classList.add(CLASSNAMES.NEXT);
+                page.background.classList.add(CLASSNAMES.NEXT);
+            }
         }
     });
     // showNode(nextState.pages[nextState.page].node);
@@ -33,7 +45,7 @@ export const renderPart = nextState => {
 
 const resetParts = state => {
     state.pages.forEach((page, i) => {
-        page.parts.forEach(part => {
+        page.parts && page.parts.forEach(part => {
             hideNode(part.node);
         });
     });
