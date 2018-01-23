@@ -1,6 +1,6 @@
 /**
  * @name storm-pages: 
- * @version 0.1.0: Tue, 23 Jan 2018 11:05:58 GMT
+ * @version 0.1.0: Tue, 23 Jan 2018 11:43:41 GMT
  * @author stormid
  * @license MIT
  */
@@ -106,12 +106,6 @@ var hideNode = function hideNode(node) {
     node.classList.add(CLASSNAMES.HIDDEN);
 };
 
-var showNode = function showNode(node) {
-    // node.removeAttribute('hidden');
-    node.classList.add(CLASSNAMES.CURRENT);
-    node.classList.remove(CLASSNAMES.HIDDEN);
-};
-
 var extractBackgrounds = function extractBackgrounds(state) {
     var backgroundContainer = n('div', { class: CLASSNAMES.BG_CONTAINER });
     state.pages.forEach(function (page) {
@@ -163,44 +157,42 @@ var initialState = Object.assign({}, INITIAL_STATE, {
 
 var renderPage = function renderPage(nextState) {
     nextState.pages.forEach(function (page, i) {
-        // if(nextState.page !== i) {
-        //     hideNode(page.node);
-        // }
         resetNode(page.node);
-        resetNode(page.background);
-        if (nextState.page > i) {
-            page.node.classList.add(CLASSNAMES.PAST);
-            page.background.classList.add(CLASSNAMES.PAST);
-            if (nextState.page - 1 === i) {
-                page.node.classList.add(CLASSNAMES.PREVIOUS);
-                page.background.classList.add(CLASSNAMES.PREVIOUS);
-            }
-        }
-        if (nextState.page === i) {
-            page.node.classList.add(CLASSNAMES.CURRENT);
-            page.background.classList.add(CLASSNAMES.CURRENT);
-        }
-        if (nextState.page < i) {
-            page.node.classList.add(CLASSNAMES.FUTURE);
-            page.background.classList.add(CLASSNAMES.FUTURE);
-            if (nextState.page + 1 === i) {
-                page.node.classList.add(CLASSNAMES.NEXT);
-                page.background.classList.add(CLASSNAMES.NEXT);
-            }
-        }
+        renderNode(page.node, nextState.page, i);
+        renderNode(page.background, nextState.page, i);
     });
-    // showNode(nextState.pages[nextState.page].node);
+};
+
+var renderNode = function renderNode(item, nextSubState, i) {
+    if (nextSubState > i) {
+        item.classList.add(CLASSNAMES.PAST);
+        if (nextSubState - 1 === i) item.classList.add(CLASSNAMES.PREVIOUS);
+    }
+    if (nextSubState === i) item.classList.add(CLASSNAMES.CURRENT);
+    if (nextSubState < i) {
+        item.classList.add(CLASSNAMES.FUTURE);
+        if (nextSubState + 1 === i) item.classList.add(CLASSNAMES.NEXT);
+    }
 };
 
 var renderPart = function renderPart(nextState) {
     resetParts(nextState);
+    //swap out subsequent  parts
     if (nextState.part === false) return;
-
     nextState.pages[nextState.page].parts.forEach(function (part, i) {
-        if (nextState.part >= i) {
-            showNode(part.node);
-        }
+        renderNode(part.node, nextState.part, i);
     });
+
+    //add subsequent parts
+    //make this option configurable/selectable
+    // resetParts(nextState);
+    // if(nextState.part === false) return;
+
+    // nextState.pages[nextState.page].parts.forEach((part, i) => {
+    //     if(nextState.part >= i) {
+    //         showNode(part.node);
+    //     }
+    // });
 };
 
 var resetParts = function resetParts(state) {

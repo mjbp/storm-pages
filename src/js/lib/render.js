@@ -3,44 +3,43 @@ import { resetNode, hideNode, showNode, isFirstItem, isLastItem } from './utils'
 
 export const renderPage = nextState => {
     nextState.pages.forEach((page, i) => {
-        // if(nextState.page !== i) {
-        //     hideNode(page.node);
-        // }
         resetNode(page.node);
-        resetNode(page.background);
-        if(nextState.page > i){
-            page.node.classList.add(CLASSNAMES.PAST);
-            page.background.classList.add(CLASSNAMES.PAST);
-            if(nextState.page - 1 === i) {
-                page.node.classList.add(CLASSNAMES.PREVIOUS);
-                page.background.classList.add(CLASSNAMES.PREVIOUS);
-            }
-        } 
-        if(nextState.page === i) {
-            page.node.classList.add(CLASSNAMES.CURRENT);
-            page.background.classList.add(CLASSNAMES.CURRENT);
-        }
-        if(nextState.page < i) {
-            page.node.classList.add(CLASSNAMES.FUTURE);
-            page.background.classList.add(CLASSNAMES.FUTURE);
-            if(nextState.page + 1 === i) {
-                page.node.classList.add(CLASSNAMES.NEXT);
-                page.background.classList.add(CLASSNAMES.NEXT);
-            }
-        }
+        renderNode(page.node, nextState.page, i);
+        renderNode(page.background, nextState.page, i);
     });
-    // showNode(nextState.pages[nextState.page].node);
 };
+
+const renderNode = (item, nextSubState, i) => {
+    if(nextSubState > i){
+        item.classList.add(CLASSNAMES.PAST);
+        if(nextSubState - 1 === i) item.classList.add(CLASSNAMES.PREVIOUS);
+    } 
+    if(nextSubState === i) item.classList.add(CLASSNAMES.CURRENT);
+    if(nextSubState < i) {
+        item.classList.add(CLASSNAMES.FUTURE);
+        if(nextSubState + 1 === i) item.classList.add(CLASSNAMES.NEXT);
+    }
+};
+
 
 export const renderPart = nextState => {
     resetParts(nextState);
-    if(nextState.part === false) return;
-    
+    //swap out subsequent  parts
+    if(nextState.part  === false) return;
     nextState.pages[nextState.page].parts.forEach((part, i) => {
-        if(nextState.part >= i) {
-            showNode(part.node);
-        }
+        renderNode(part.node, nextState.part, i);
     });
+
+    //add subsequent parts
+    //make this option configurable/selectable
+    // resetParts(nextState);
+    // if(nextState.part === false) return;
+    
+    // nextState.pages[nextState.page].parts.forEach((part, i) => {
+    //     if(nextState.part >= i) {
+    //         showNode(part.node);
+    //     }
+    // });
 };
 
 const resetParts = state => {
