@@ -47,7 +47,6 @@ export default {
 		renderPart(this.state);
 		renderButtons(this.state);
 		this.postRender();
-		// renderButtons(this.state;
 	},
 	postRender(){
 		if(this.state.pages[this.state.page].callback) this.state.pages[this.state.page].callback();
